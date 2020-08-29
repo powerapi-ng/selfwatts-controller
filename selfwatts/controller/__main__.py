@@ -2,6 +2,7 @@ import logging
 from argparse import ArgumentParser
 
 from selfwatts.controller import __version__ as selfwatts_version
+from selfwatts.controller.libpfm_wrapper import get_available_pmus
 from selfwatts.controller.invoker import HwpcSensorInvoker
 from selfwatts.controller.database import MongoDatabaseAdapter
 from selfwatts.controller.controller import SelfWattsController

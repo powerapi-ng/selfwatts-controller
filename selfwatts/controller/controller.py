@@ -3,7 +3,7 @@ from random import shuffle
 
 from selfwatts.controller.database import DatabaseAdapter
 from selfwatts.controller.invoker import HwpcSensorInvoker
-from selfwatts.controller.libpfm_wrapper import get_available_perf_counters, get_available_pmus, get_available_events_for_pmu
+from selfwatts.controller.libpfm_wrapper import get_available_perf_counters, get_available_events_for_pmu
 
 
 class SelfWattsController:
