@@ -11,6 +11,7 @@ from selfwatts.controller.controller import SelfWattsController
 def generate_arg_parser() -> ArgumentParser:
     parser = ArgumentParser(description='SelfWatts Controller.')
     parser.add_argument('--hostname', type=str, required=True)
+    parser.add_argument('--frequency', type=int, default=1000)
     parser.add_argument('--pmu', type=str, required=True, choices=get_available_pmus())
     parser.add_argument('--mongodb-uri', type=str, required=True)
     parser.add_argument('--mongodb-database', type=str, default='selfwatts')
@@ -23,7 +24,7 @@ if __name__ == '__main__':
 
     try:
         args = generate_arg_parser().parse_args()
-        sensor = HwpcSensorInvoker(args.hostname, args.mongodb_uri, args.mongodb_database, 'sensor')
+        sensor = HwpcSensorInvoker(args.hostname, args.frequency, args.mongodb_uri, args.mongodb_database, 'sensor')
         db = MongoDatabaseAdapter(args.mongodb_uri, args.mongodb_database, args.mongodb_collection)
         controller = SelfWattsController(args.hostname, args.pmu, db, sensor)
         controller.handle_control_events()

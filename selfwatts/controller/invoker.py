@@ -7,8 +7,9 @@ class HwpcSensorInvoker:
     HwPC-sensor invoker class.
     """
 
-    def __init__(self, hostname: str, uri: str, database: str, collection: str):
+    def __init__(self, hostname: str, frequency: int, uri: str, database: str, collection: str):
         self.hostname = hostname
+        self.frequency = frequency
         self.uri = uri
         self.database = database
         self.collection = collection
@@ -19,7 +20,7 @@ class HwpcSensorInvoker:
         Generate the command line arguments to start the sensor.
         """
         cmdline = ['/usr/bin/hwpc-sensor']
-        cmdline += ['-n', self.hostname]
+        cmdline += ['-n', self.hostname, '-f', self.frequency]
         cmdline += ['-r', 'mongodb', '-U', self.uri, '-D', self.database, '-C', self.collection]
         cmdline += ['-s', 'rapl', '-o', '-e', 'RAPL_ENERGY_PKG']
         cmdline += ['-s', 'msr', '-e', 'TSC', '-e', 'APERF', '-e', 'MPERF']
