@@ -1,3 +1,4 @@
+import logging
 from typing import List
 from random import shuffle
 
@@ -55,8 +56,11 @@ class SelfWattsController:
         """
         Handle the control events from the database.
         """
+        logging.info('there is {} events and {} available performance counters'.format(len(self.available_events), self.available_perf_counters))
+        logging.info('watching for control events from database...')
         while True:
             control_event = self.db.watch_control_event(self.hostname)
+            logging.debug('received control event: {!r}'.format(control_event))
             self.sensor.stop()
             self.sensor.start(self._generate_events_list(control_event.events))
 

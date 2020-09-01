@@ -1,3 +1,4 @@
+import logging
 from typing import List, Dict
 from subprocess import Popen
 
@@ -32,6 +33,7 @@ class HwpcSensorInvoker:
         Start the sensor process.
         """
         if len(events) > 0:
+            logging.info('starting hwpc-sensor with events: {!r}'.format(events))
             self.process = Popen(self._generate_cmdline(events))
 
     def stop(self) -> None:
@@ -39,6 +41,7 @@ class HwpcSensorInvoker:
         Stop the sensor process.
         """
         if self.process is not None:
+            logging.info('stopping hwpc-sensor...')
             self.process.terminate()
             self.process.wait()
             self.process = None
