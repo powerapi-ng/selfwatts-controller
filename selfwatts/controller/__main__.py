@@ -19,7 +19,7 @@ def generate_arg_parser() -> ArgumentParser:
     return parser
 
 if __name__ == '__main__':
-    logging.getLogger().setLevel(logging.DEBUG) 
+    logging.basicConfig(format='%(levelname).1s: %(asctime)s controller: %(message)s', datefmt='%y-%m-%d %H:%M:%S', level=logging.DEBUG)
     logging.info('SelfWatts Controller version ' + selfwatts_version)
 
     try:
