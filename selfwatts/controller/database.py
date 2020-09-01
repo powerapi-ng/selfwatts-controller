@@ -30,7 +30,7 @@ class MongoDatabaseAdapter(DatabaseAdapter):
         """
         Setup the collection change stream cursor.
         """
-        pipeline = [{'$match': {'operationType': 'insert'}}, {'$match': {'fullDocument.hostname': hostname}}]
+        pipeline = [{'$match': {'operationType': 'insert'}}, {'$match': {'fullDocument.sensor': hostname}}]
         self.cursor = self.collection.watch(pipeline=pipeline)
 
     def watch_control_event(self, hostname: str) -> ControlEvent:
@@ -41,7 +41,5 @@ class MongoDatabaseAdapter(DatabaseAdapter):
             self._setup_watch_cursor(hostname)
 
         doc = next(self.cursor)['fullDocument']
-        return ControlEvent(doc['timestamp'], doc['hostname'], doc['events'])
-
-
+        return ControlEvent(doc['timestamp'], doc['sensor'], doc['target'], doc['action'], doc['parameters'])
 

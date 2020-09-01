@@ -62,5 +62,5 @@ class SelfWattsController:
             control_event = self.db.watch_control_event(self.hostname)
             logging.debug('received control event: {!r}'.format(control_event))
             self.sensor.stop()
-            self.sensor.start(self._generate_events_list(control_event.events))
+            self.sensor.start(self._generate_events_list(control_event.parameters))
 
