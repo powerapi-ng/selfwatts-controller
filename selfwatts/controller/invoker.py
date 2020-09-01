@@ -20,7 +20,7 @@ class HwpcSensorInvoker:
         Generate the command line arguments to start the sensor.
         """
         cmdline = ['/usr/bin/hwpc-sensor']
-        cmdline += ['-n', self.hostname, '-f', self.frequency]
+        cmdline += ['-n', self.hostname, '-f', str(self.frequency)]
         cmdline += ['-r', 'mongodb', '-U', self.uri, '-D', self.database, '-C', self.collection]
         cmdline += ['-s', 'rapl', '-o', '-e', 'RAPL_ENERGY_PKG']
         cmdline += ['-s', 'msr', '-e', 'TSC', '-e', 'APERF', '-e', 'MPERF']
