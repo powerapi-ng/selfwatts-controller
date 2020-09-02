@@ -8,15 +8,22 @@ get_available_perf_counters(PyObject * Py_UNUSED(self), PyObject * Py_UNUSED(arg
 {
     const unsigned int leaf = 0x0000000A; /* Architectural Performance Monitoring Leaf */
     unsigned int eax, ebx, ecx, edx;
-    long available_perf_counter;
+    long version_id, general_perf_counters, fixed_perf_counters;
 
     if (!__get_cpuid(leaf, &eax, &ebx, &ecx, &edx)) {
-        PyErr_SetString(PyExc_RuntimeError, "number of available perf counter is unknown for this CPU.");
+        PyErr_SetString(PyExc_RuntimeError, "failed to query CPU performance monitoring information.");
         return NULL;
     }
 
-    available_perf_counter = (eax >> 8) & 0xFF; /* Bits 15 - 08: Number of general-purpose performance monitoring counter per logical processor. */
-    return PyLong_FromLong(available_perf_counter);
+    version_id = eax & 0xFF; /* EAX Bits 07 - 00: Version ID of architectural performance monitoring */
+    if (version_id == 0) {
+        PyErr_SetString(PyExc_RuntimeError, "this CPU does not support performance monitoring.");
+        return NULL;
+    }
+
+    general_perf_counters = (eax >> 8) & 0xFF; /* EAX Bits 15 - 08: Number of general-purpose performance monitoring counter per logical processor. */
+    fixed_perf_counters = (version_id > 1) ? edx & 0x1F : 0; /* EDX Bits 04 - 00: Number of fixed-function performance counters  (if Version ID > 1) */
+    return Py_BuildValue("(ii)", fixed_perf_counters, general_perf_counters);
 }
 
 static int
@@ -155,7 +162,7 @@ libpfm_wrapper_deinitialize(void * Py_UNUSED(self))
 }
 
 static PyMethodDef libpfm_wrapper_methods[] = {
-    {"get_available_perf_counters", get_available_perf_counters, METH_NOARGS, "Returns the number of available performance counters."},
+    {"get_available_perf_counters", get_available_perf_counters, METH_NOARGS, "Returns the number of (fixed, general) available performance counters."},
     {"get_available_pmus", get_available_pmus, METH_NOARGS, "Returns the list of available PMUs."},
     {"get_available_events_for_pmu", get_available_events_for_pmu, METH_VARARGS, "Returns the list of available events name for the given PMU."},
     {NULL, NULL, 0, NULL}

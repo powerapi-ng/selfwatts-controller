@@ -17,7 +17,7 @@ class SelfWattsController:
         self.db = db
         self.pmu = pmu
         self.sensor = sensor
-        self.available_perf_counters = get_available_perf_counters()
+        self.fixed_perf_counters, self.general_perf_counters = get_available_perf_counters()
         self.available_events = self._get_available_events(pmu)
 
     def _get_available_events(self, pmu: str) -> List[str]:
@@ -43,7 +43,7 @@ class SelfWattsController:
         """
         Generate the events list to be monitored by the sensor.
         """
-        available_slots = self.available_perf_counters - fixed_events.count(None)
+        available_slots = self.general_perf_counters - fixed_events.count(None)
         events = [fixed_event for fixed_event in fixed_events if fixed_event is not None]
 
         for _ in range(len(events), available_slots):
@@ -56,7 +56,7 @@ class SelfWattsController:
         """
         Handle the control events from the database.
         """
-        logging.info('there is {} events and {} available performance counters'.format(len(self.available_events), self.available_perf_counters))
+        logging.info('there is {} events and {} fixed {} general performance counters for {} PMU'.format(len(self.available_events), self.fixed_perf_counter, self.general_perf_counters), self.pmu)
         logging.info('watching for control events from database...')
         while True:
             control_event = self.db.watch_control_event(self.hostname)
