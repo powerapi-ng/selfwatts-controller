@@ -13,6 +13,7 @@ def generate_arg_parser() -> ArgumentParser:
     parser.add_argument('--hostname', type=str, required=True)
     parser.add_argument('--frequency', type=int, default=1000)
     parser.add_argument('--pmu', type=str, required=True, choices=get_available_pmus())
+    parser.add_argument('--pmu-fixed-events', type=str, nargs='*', default=[])
     parser.add_argument('--mongodb-uri', type=str, required=True)
     parser.add_argument('--mongodb-database', type=str, default='selfwatts')
     parser.add_argument('--mongodb-collection', type=str, default='controller')
@@ -26,7 +27,7 @@ if __name__ == '__main__':
         args = generate_arg_parser().parse_args()
         sensor = HwpcSensorInvoker(args.hostname, args.frequency, args.mongodb_uri, args.mongodb_database, 'sensor')
         db = MongoDatabaseAdapter(args.mongodb_uri, args.mongodb_database, args.mongodb_collection)
-        controller = SelfWattsController(args.hostname, args.pmu, db, sensor)
+        controller = SelfWattsController(args.hostname, args.pmu, args.pmu_fixed_events, db, sensor)
         controller.handle_control_events()
     except KeyboardInterrupt:
         pass
