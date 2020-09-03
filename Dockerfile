@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && \
     apt install -y curl build-essential git devscripts debhelper dpatch python3-dev libncurses-dev swig && \
     update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
-    git clone -b msr-pmu-old https://github.com/gfieni/libpfm4.git /usr/src/libpfm4 && \
+    git clone -b selfwatts https://github.com/gfieni/libpfm4.git /usr/src/libpfm4 && \
     cd /usr/src/libpfm4 && \
     rm -fr debian && \
     curl -s http://archive.ubuntu.com/ubuntu/pool/main/libp/libpfm4/libpfm4_4.10.1+git20-g7700f49-2.debian.tar.xz |tar xvJ && \
