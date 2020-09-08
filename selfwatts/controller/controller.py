@@ -62,9 +62,17 @@ class SelfWattsController:
         """
         logging.info('there is {} events and {} fixed {} general performance counters for {} PMU'.format(len(self.available_events), self.fixed_perf_counters, self.general_perf_counters, self.pmu))
         logging.info('watching for control events from database...')
+
+        current_events = []
         while True:
             control_event = self.db.watch_control_event(self.hostname)
             logging.debug('received control event: {!r}'.format(control_event))
-            self.sensor.stop()
-            self.sensor.start(self._generate_events_list(control_event.parameters))
+
+            new_events = self._generate_events_list(control_event.parameters)
+            if set(current_events) != set(new_events):
+                self.sensor.stop()
+                self.sensor.start(new_events)
+                current_events = new_events[:]
+            else:
+                logging.debug('current events set match new events set, this control event is ignored')
 
