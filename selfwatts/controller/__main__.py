@@ -1,4 +1,5 @@
 import logging
+import random
 from argparse import ArgumentParser
 
 from selfwatts.controller import __version__ as selfwatts_version
@@ -10,6 +11,7 @@ from selfwatts.controller.controller import SelfWattsController
 
 def generate_arg_parser() -> ArgumentParser:
     parser = ArgumentParser(description='SelfWatts Controller.')
+    parser.add_argument('--random-seed', type=int, default=None)
     parser.add_argument('--hostname', type=str, required=True)
     parser.add_argument('--frequency', type=int, default=1000)
     parser.add_argument('--pmu', type=str, required=True, choices=get_available_pmus())
@@ -25,6 +27,7 @@ if __name__ == '__main__':
 
     try:
         args = generate_arg_parser().parse_args()
+        random.seed(args.random_seed)
         sensor = HwpcSensorInvoker(args.hostname, args.frequency, args.mongodb_uri, args.mongodb_database, 'sensor')
         db = MongoDatabaseAdapter(args.mongodb_uri, args.mongodb_database, args.mongodb_collection)
         controller = SelfWattsController(args.hostname, args.pmu, args.pmu_fixed_events, db, sensor)
