@@ -19,7 +19,6 @@ class SelfWattsController:
         self.fixed_events = fixed_events
         self.sensor = sensor
         self.fixed_perf_counters, self.general_perf_counters = get_available_perf_counters()
-        self.available_events = self._get_available_events(pmu)
 
     def _get_available_events(self, pmu: str) -> List[str]:
         """
@@ -40,7 +39,7 @@ class SelfWattsController:
         shuffle(available_events)
         return available_events
 
-    def _generate_events_list(self, selected_events: List[str]) -> List[str]:
+    def _generate_events_list(self, available_events: List[str], selected_events: List[str]) -> List[str]:
         """
         Generate the events list to be monitored by the sensor.
         """
@@ -48,8 +47,8 @@ class SelfWattsController:
         events = [event for event in selected_events if event is not None]
 
         for _ in range(len(events), available_slots):
-            if len(self.available_events) > 0:
-                events.append(self.available_events.pop())
+            if len(available_events) > 0:
+                events.append(available_events.pop())
 
         for fixed_event in self.fixed_events:
             events.insert(0, fixed_event)
@@ -60,7 +59,9 @@ class SelfWattsController:
         """
         Handle the control events from the database.
         """
-        logging.info('there is {} events and {} fixed {} general performance counters for {} PMU'.format(len(self.available_events), self.fixed_perf_counters, self.general_perf_counters, self.pmu))
+        available_events = self._get_available_events(self.pmu)
+
+        logging.info('there is {} events and {} fixed {} general performance counters for {} PMU'.format(len(available_events), self.fixed_perf_counters, self.general_perf_counters, self.pmu))
         logging.info('watching for control events from database...')
 
         current_events = []
@@ -68,7 +69,7 @@ class SelfWattsController:
             control_event = self.db.watch_control_event(self.hostname)
             logging.debug('received control event: {!r}'.format(control_event))
 
-            new_events = self._generate_events_list(control_event.parameters)
+            new_events = self._generate_events_list(available_events, control_event.parameters)
             if set(current_events) != set(new_events):
                 self.sensor.stop()
                 self.sensor.start(new_events)
