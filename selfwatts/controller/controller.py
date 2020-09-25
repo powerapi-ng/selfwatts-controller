@@ -70,6 +70,9 @@ class SelfWattsController:
             logging.debug('received control event: {!r}'.format(control_event))
 
             new_events = self._generate_events_list(available_events, control_event.parameters)
+            logging.info('new events set for sensor: {!r}'.format(new_events))
+            logging.info('there is {} available events remaining'.format(len(available_events)))
+
             if set(current_events) != set(new_events):
                 self.sensor.stop()
                 self.sensor.start(new_events)
