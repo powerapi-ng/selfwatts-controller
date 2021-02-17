@@ -23,7 +23,7 @@ class HwpcSensorInvoker:
         cmdline = ['/usr/bin/hwpc-sensor']
         cmdline += ['-n', self.hostname, '-f', str(self.frequency)]
         cmdline += ['-r', 'mongodb', '-U', self.uri, '-D', self.database, '-C', self.collection]
-        cmdline += ['-s', 'rapl', '-o', '-e', 'RAPL_ENERGY_PKG']
+        cmdline += ['-s', 'rapl', '-o', '-e', 'RAPL_ENERGY_PKG', '-e', 'RAPL_ENERGY_DRAM']
         cmdline += ['-s', 'msr', '-e', 'TSC', '-e', 'APERF', '-e', 'MPERF']
         cmdline += ['-c', 'core'] + [arg for event in events for arg in ('-e', event)]
         return cmdline
